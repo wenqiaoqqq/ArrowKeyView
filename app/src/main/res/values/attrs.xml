@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ArrowKeyView">
+        <attr name="outerRingColor" format="reference|color"/>
+        <attr name="outerRingWidth" format="dimension"/>
+        <attr name="innerRingColor" format="reference|color"/>
+        <attr name="innerRingWidth" format="dimension"/>
+        <attr name="leftArrowIcon" format="reference"/>
+        <attr name="upArrowIcon" format="reference"/>
+        <attr name="rightArrowIcon" format="reference"/>
+        <attr name="downArrowIcon" format="reference"/>
+    </declare-styleable>
+</resources>
