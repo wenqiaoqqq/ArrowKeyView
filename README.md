@@ -2,7 +2,7 @@
 some customview 
 
 ## 截图
-<div> <img src='https://raw.githubusercontent.com/Chanven/CommonPullToRefresh/master/raw/main.png' width='270px'/> </div>
+<div> <img src='https://github.com/wenqiaoqqq/MyCustomView/tree/master/raw/view.gif' width='270px'/> </div>
 
 
 # Gradle引用
