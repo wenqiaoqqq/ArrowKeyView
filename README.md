@@ -36,3 +36,15 @@
             app:rightArrowIcon="@mipmap/icon_ptz_right"
             app:downArrowIcon="@mipmap/icon_ptz_down"/>
 ```
+### 属性说明
+| 属性名 | 说明 | 单位 | 
+| - | :-: | -: | 
+| outerRingColor | 外围两个圆环颜色 | reference|color | 
+| innerRingColor | 里面小圆环颜色 | reference|color | 
+| outerRingWidth | 外围两个圆环宽度 | dimension |
+| innerRingWidth | 里面小圆环宽度 | dimension |
+| leftArrowIcon | 左方向键 | reference |
+| upArrowIcon | 上方向键 | reference |
+| rightArrowIcon | 右方向键 | reference |
+| downArrowIcon | 下方向键 | reference |
+
