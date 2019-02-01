@@ -36,9 +36,34 @@
             app:rightArrowIcon="@mipmap/icon_ptz_right"
             app:downArrowIcon="@mipmap/icon_ptz_down"/>
 ```
+```java
+ArrowKeyView arrowKeyView = findViewById(R.id.arrowKeyView);
+arrowKeyView.setOnclickPtzListener(new ArrowKeyView.OnclickPtzListener() {
+    @Override
+    public void clickLeft() {
+
+    }
+
+    @Override
+    public void clickUp() {
+
+    }
+
+    @Override
+    public void clickRight() {
+
+    }
+
+    @Override
+    public void clickDown() {
+
+    }
+});
+
+```
 ### 属性说明
 | 属性名 | 说明 | 单位 | 
-| - | :-: | -: | 
+| - | :-: | :-: | 
 | outerRingColor | 外围两个圆环颜色 | reference|color | 
 | innerRingColor | 里面小圆环颜色 | reference|color | 
 | outerRingWidth | 外围两个圆环宽度 | dimension |
