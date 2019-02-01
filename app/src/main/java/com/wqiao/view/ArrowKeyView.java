@@ -1,6 +1,7 @@
 package com.wqiao.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,12 +24,16 @@ import com.wqiao.view.util.DensityUtils;
  */
 
 public class ArrowKeyView extends View {
+    public static final String TAG = ArrowKeyView.class.getName();
 
     public static final int DIR_UNDEFINE = 0x100;
     public static final int DIR_LEFT = 0x101;//点击左边
     public static final int DIR_UP = 0x102;//点击上边
     public static final int DIR_RIGHT = 0x103;//点击右边
     public static final int DIR_DOWN = 0x104;//点击下边
+
+    //当前点击的方向
+    private int dir = DIR_UNDEFINE;
 
     private final static int PART_ONE = 1;
     private final static int PART_TWO = 2;
@@ -37,16 +42,23 @@ public class ArrowKeyView extends View {
 
     private final static int START_DEGREE = -135;
 
-    private int blueCircleWidth = 0;//蓝色圆环的宽度
-
     private int center = 0;
     private int innerRadius = 0;
 
-    private int dir = DIR_UNDEFINE;
-
-    private int blueCircleColor = Color.rgb(136, 203, 246);
-    private int grayCircleColor = Color.rgb(207, 234, 252);
+    //外环颜色(大圆环和小圆环)
+    private int outerRingColor = Color.rgb(136, 203, 246);
+    //内环颜色(最里面的圆环)
+    private int innerRingColor = Color.rgb(207, 234, 252);
+    //背景颜色
     private int backgroundColor = Color.rgb(255, 255, 255);
+
+    //外环宽度
+    private int outerRingWidth;
+    //内环宽度
+    private int innerRingWidth;
+
+    private int DEFUALT_VIEW_WIDTH;
+    private int DEFUALT_VIEW_HEIGHT;
 
     private Paint outerCirclepaint = new Paint();
     private Paint paint = new Paint();
@@ -76,44 +88,81 @@ public class ArrowKeyView extends View {
     public ArrowKeyView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        context.getTheme().obtainStyledAttributes(attrs, R.styleable.ArrowKeyView, defStyleAttr, 0);
+        DEFUALT_VIEW_WIDTH = DEFUALT_VIEW_HEIGHT = DensityUtils.dp2px(context, 180);
+
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ArrowKeyView, defStyleAttr, 0);
+        outerRingColor = a.getColor(R.styleable.ArrowKeyView_outerRingColor, Color.rgb(136, 203, 246));
+        outerRingWidth = a.getDimensionPixelSize(R.styleable.ArrowKeyView_outerRingWidth, DensityUtils.dp2px(context, 2));
+        innerRingColor = a.getColor(R.styleable.ArrowKeyView_innerRingColor, Color.rgb(207, 234, 252));
+        innerRingWidth = a.getDimensionPixelSize(R.styleable.ArrowKeyView_innerRingWidth, outerRingWidth / 2);
+        ptzLeft = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.ArrowKeyView_leftArrowIcon, R.mipmap.lechange_ptz_left));
+        ptzUp = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.ArrowKeyView_upArrowIcon, R.mipmap.lechange_ptz_up));
+        ptzRight = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.ArrowKeyView_rightArrowIcon, R.mipmap.lechange_ptz_right));
+        ptzDown = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.ArrowKeyView_downArrowIcon, R.mipmap.lechange_ptz_down));
+
+        a.recycle();
+
+        init();
     }
 
     /**
      * 初始化绘制弧形所在矩形的四点坐标
      **/
     private void init(){
-        blueCircleWidth = DensityUtils.dp2px(context, 2);
-        center = DensityUtils.dp2px(context, 90);
-        innerRadius = center / 3;
-
         outerCirclepaint.setStyle(Paint.Style.STROKE);
         outerCirclepaint.setAntiAlias(true);
-        outerCirclepaint.setColor(blueCircleColor);
-        outerCirclepaint.setStrokeWidth(blueCircleWidth);
+        outerCirclepaint.setColor(outerRingColor);
+        outerCirclepaint.setStrokeWidth(outerRingWidth);
 
         paint.setAntiAlias(true);
 
         linepaint.setStyle(Paint.Style.FILL);
         linepaint.setAntiAlias(true);
-        linepaint.setColor(grayCircleColor);
+        linepaint.setColor(innerRingColor);
         linepaint.setStrokeWidth(DensityUtils.dp2px(context, 1));
-
-        mRectF.left = blueCircleWidth;
-        mRectF.top = blueCircleWidth;
-        mRectF.right = 2 * center - blueCircleWidth;
-        mRectF.bottom = 2 * center - blueCircleWidth;
-
-        ptzLeft = BitmapFactory.decodeResource(getResources(), R.mipmap.lechange_ptz_left);
-        ptzUp = BitmapFactory.decodeResource(getResources(), R.mipmap.lechange_ptz_up);
-        ptzRight = BitmapFactory.decodeResource(getResources(), R.mipmap.lechange_ptz_right);
-        ptzDown = BitmapFactory.decodeResource(getResources(), R.mipmap.lechange_ptz_down);
     }
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = measureDimension(DEFUALT_VIEW_WIDTH,widthMeasureSpec);
+        int height = measureDimension(DEFUALT_VIEW_HEIGHT,heightMeasureSpec);
+        //将计算的宽和高设置进去，保存，最后一步一定要有
+        setMeasuredDimension(width,height);
+
+        center = width / 2;
+        innerRadius = center / 3;
+        mRectF.left = outerRingWidth;
+        mRectF.top = outerRingWidth;
+        mRectF.right = 2 * center - outerRingWidth;
+        mRectF.bottom = 2 * center - outerRingWidth;
+    }
+
+    /**
+     * @param defualtSize   设置的默认大小
+     * @param measureSpec   父控件传来的widthMeasureSpec，heightMeasureSpec
+     * @return  结果
+     */
+    public int measureDimension(int defualtSize,int measureSpec){
+        int result = defualtSize;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        //1,layout中自定义组件给出来确定的值，比如100dp
+        //2,layout中自定义组件使用的是match_parent，但父控件的size已经可以确定了，比如设置的具体的值或者match_parent
+        if(specMode == MeasureSpec.EXACTLY){
+            result = specSize;
+        }
+        //layout中自定义组件使用的wrap_content
+        else if(specMode == MeasureSpec.AT_MOST){
+            result = Math.min(defualtSize,specSize);//建议：result不能大于specSize
+        }
+        //UNSPECIFIED,没有任何限制，所以可以设置任何大小
+        else {
+            result = defualtSize;
+        }
+        return result;
     }
 
     @Override
@@ -121,16 +170,16 @@ public class ArrowKeyView extends View {
         super.onDraw(canvas);
 
         //画最外面的蓝色圆环
-        canvas.drawCircle(center, center, center - blueCircleWidth, outerCirclepaint);
+        canvas.drawCircle(center, center, center - outerRingWidth, outerCirclepaint);
         //画两条分割线
-        canvas.drawLine((float)((1 - Math.sqrt(2) / 2) * center + blueCircleWidth), (float)((1 - Math.sqrt(2) / 2) * center + blueCircleWidth),
-                (float)((1 + Math.sqrt(2) / 2) * center - blueCircleWidth), (float)((1 + Math.sqrt(2) / 2) * center - blueCircleWidth), linepaint);
-        canvas.drawLine((float)((1 - Math.sqrt(2) / 2) * center + blueCircleWidth), (float)((1 + Math.sqrt(2) / 2) * center - blueCircleWidth),
-                (float)((1 + Math.sqrt(2) / 2) * center - blueCircleWidth), (float)((1 - Math.sqrt(2) / 2) * center + blueCircleWidth), linepaint);
+        canvas.drawLine((float)((1 - Math.sqrt(2) / 2) * center + outerRingWidth), (float)((1 - Math.sqrt(2) / 2) * center + outerRingWidth),
+                (float)((1 + Math.sqrt(2) / 2) * center - outerRingWidth), (float)((1 + Math.sqrt(2) / 2) * center - outerRingWidth), linepaint);
+        canvas.drawLine((float)((1 - Math.sqrt(2) / 2) * center + outerRingWidth), (float)((1 + Math.sqrt(2) / 2) * center - outerRingWidth),
+                (float)((1 + Math.sqrt(2) / 2) * center - outerRingWidth), (float)((1 - Math.sqrt(2) / 2) * center + outerRingWidth), linepaint);
 
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(blueCircleColor);
-        paint.setStrokeWidth(blueCircleWidth);
+        paint.setColor(outerRingColor);
+        paint.setStrokeWidth(outerRingWidth);
 
         switch (dir){
             case DIR_LEFT:
@@ -167,14 +216,14 @@ public class ArrowKeyView extends View {
 
         //再画蓝色的圆环
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(blueCircleColor);
-        paint.setStrokeWidth(blueCircleWidth);
+        paint.setColor(outerRingColor);
+        paint.setStrokeWidth(outerRingWidth);
         canvas.drawCircle(center, center, innerRadius, paint);
 
         //画里面的灰色小圆
-        paint.setColor(grayCircleColor);
-        paint.setStrokeWidth(blueCircleWidth / 2);
-        canvas.drawCircle(center, center, innerRadius - 20, paint);
+        paint.setColor(innerRingColor);
+        paint.setStrokeWidth(innerRingWidth);
+        canvas.drawCircle(center, center, innerRadius * 2 /3, paint);
 
         canvas.drawBitmap(ptzLeft, center / 4, center - ptzLeft.getHeight()/2, paint);
         canvas.drawBitmap(ptzUp, center - ptzUp.getWidth()/2, center / 4, paint);
@@ -183,12 +232,6 @@ public class ArrowKeyView extends View {
 
         paint.setXfermode(null);
     }
-
-    @Override
-    public void setOnLongClickListener(@Nullable OnLongClickListener l) {
-        super.setOnLongClickListener(l);
-    }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -205,12 +248,12 @@ public class ArrowKeyView extends View {
                     int which = touchOnWhichPart(event);
                     switch (which) {
                         case PART_ONE:
-                            Log.i("wenqiao", "onTouchEvent--->PART_ONE");
+                            Log.i(TAG, "onTouchEvent--->PART_ONE");
 
                             alfa = Math.atan2(eventX - center, center - eventY) * 180 / Math.PI;
 
                             if( alfa > 0 && alfa < 45 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_ONE--->DIR_UP");
+                                Log.i(TAG, "onTouchEvent--->PART_ONE--->DIR_UP");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickUp();
@@ -218,7 +261,7 @@ public class ArrowKeyView extends View {
                                 dir = DIR_UP;
                             }
                             else if( alfa >= 45 && alfa < 90 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_ONE--->DIR_RIGHT");
+                                Log.i(TAG, "onTouchEvent--->PART_ONE--->DIR_RIGHT");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickRight();
@@ -227,12 +270,12 @@ public class ArrowKeyView extends View {
                             }
                             break;
                         case PART_TWO:
-                            Log.i("wenqiao", "onTouchEvent--->PART_TWO");
+                            Log.i(TAG, "onTouchEvent--->PART_TWO");
 
                             alfa = Math.atan2(eventY - center, eventX - center) * 180 / Math.PI;
 
                             if( alfa > 0 && alfa < 45 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_TWO--->DIR_RIGHT");
+                                Log.i(TAG, "onTouchEvent--->PART_TWO--->DIR_RIGHT");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickRight();
@@ -240,7 +283,7 @@ public class ArrowKeyView extends View {
                                 dir = DIR_RIGHT;
                             }
                             else if( alfa >= 45 && alfa < 90 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_TWO--->DIR_DOWN");
+                                Log.i(TAG, "onTouchEvent--->PART_TWO--->DIR_DOWN");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickDown();
@@ -249,12 +292,12 @@ public class ArrowKeyView extends View {
                             }
                             break;
                         case PART_THREE:
-                            Log.i("wenqiao", "onTouchEvent--->PART_THREE");
+                            Log.i(TAG, "onTouchEvent--->PART_THREE");
 
                             alfa = Math.atan2(center - eventX, eventY - center) * 180 / Math.PI;
 
                             if( alfa > 0 && alfa < 45 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_THREE--->DIR_DOWN");
+                                Log.i(TAG, "onTouchEvent--->PART_THREE--->DIR_DOWN");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickDown();
@@ -262,7 +305,7 @@ public class ArrowKeyView extends View {
                                 dir = DIR_DOWN;
                             }
                             else if( alfa >= 45 && alfa < 90 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_THREE--->DIR_LEFT");
+                                Log.i(TAG, "onTouchEvent--->PART_THREE--->DIR_LEFT");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickLeft();
@@ -271,12 +314,12 @@ public class ArrowKeyView extends View {
                             }
                             break;
                         case PART_FOUR:
-                            Log.i("wenqiao", "onTouchEvent--->PART_FOUR");
+                            Log.i(TAG, "onTouchEvent--->PART_FOUR");
 
                             alfa = Math.atan2(center - eventY, center - eventX) * 180 / Math.PI;
 
                             if( alfa > 0 && alfa < 45 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_FOUR--->DIR_LEFT");
+                                Log.i(TAG, "onTouchEvent--->PART_FOUR--->DIR_LEFT");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickLeft();
@@ -285,7 +328,7 @@ public class ArrowKeyView extends View {
 
                             }
                             else if( alfa >= 45 && alfa < 90 ){
-                                Log.i("wenqiao", "onTouchEvent--->PART_FOUR--->DIR_UP");
+                                Log.i(TAG, "onTouchEvent--->PART_FOUR--->DIR_UP");
 
                                 if( onclickPtzListener != null ){
                                     onclickPtzListener.clickUp();
@@ -304,7 +347,6 @@ public class ArrowKeyView extends View {
 
         invalidate();
 
-//        return super.onTouchEvent(event);
         return true;
     }
 
