@@ -2,7 +2,7 @@
 some customview 
 
 ## 截图
-![image](https://github.com/wenqiaoqqq/MyCustomView/tree/master/raw/view.gif)
+![image](https://github.com/wenqiaoqqq/MyCustomView/blob/master/raw/view.gif)
 
 
 # Gradle引用
