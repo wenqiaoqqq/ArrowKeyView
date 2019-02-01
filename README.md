@@ -1,7 +1,9 @@
 # MyCustomView
 some customview 
 
+## 截图
+
 
 # Gradle引用
 
-[![](https://jitpack.io/v/wenqiaoqqq/MyCustomView.svg)](https://jitpack.io/#wenqiaoqqq/MyCustomView)
+implementation 'com.github.wenqiaoqqq:MyCustomView:v1.4'
