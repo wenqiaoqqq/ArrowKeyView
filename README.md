@@ -1,12 +1,23 @@
-# MyCustomView
-some customview 
+# ArrowKeyView
+  customview to handle direction 
 
 ## 截图
 ![image](https://github.com/wenqiaoqqq/MyCustomView/blob/master/raw/view.gif)
 
 
-# Gradle引用
+# Usage
 
+## Gradle
+* Add it in your root build.gradle at the end of repositories:
+```
+ allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+* Add the dependency
 ```
  implementation 'com.github.wenqiaoqqq:MyCustomView:v1.4'
 ```
