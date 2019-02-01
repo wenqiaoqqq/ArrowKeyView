@@ -2,7 +2,7 @@
 some customview 
 
 ## 截图
-<div> <img src='https://raw.githubusercontent.com/wenqiaoqqq/MyCustomView/blob/master/raw/view.gif' width='270px'/> </div>
+![image](https://github.com/wenqiaoqqq/MyCustomView/tree/master/raw/view.gif)
 
 
 # Gradle引用
