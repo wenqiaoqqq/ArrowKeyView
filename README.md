@@ -11,6 +11,7 @@ some customview
  implementation 'com.github.wenqiaoqqq:MyCustomView:v1.4'
 ```
 
+* 布局文件使用
 ```xml
 <com.wqiao.view.ArrowKeyView
             android:layout_width="180dp"
