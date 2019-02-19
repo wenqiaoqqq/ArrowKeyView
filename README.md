@@ -19,7 +19,7 @@
 ```
 * Add the dependency
 ```
- implementation 'com.github.wenqiaoqqq:MyCustomView:v1.5'
+ implementation 'com.github.wenqiaoqqq:ArrowKeyView:v1.5'
 ```
 
 ## 布局文件使用
