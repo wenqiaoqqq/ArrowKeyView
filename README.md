@@ -64,8 +64,8 @@ arrowKeyView.setOnclickPtzListener(new ArrowKeyView.OnclickPtzListener() {
 ### 属性说明
 | 属性名 | 说明 | 单位 | 
 | ------ | ------ | ------ | 
-| outerRingColor | 外围两个圆环颜色 | reference | color | 
-| innerRingColor | 里面小圆环颜色 | reference | color | 
+| outerRingColor | 外围两个圆环颜色 | reference &#124; color | 
+| innerRingColor | 里面小圆环颜色 | reference &#124; color | 
 | outerRingWidth | 外围两个圆环宽度 | dimension |
 | innerRingWidth | 里面小圆环宽度 | dimension |
 | leftArrowIcon | 左方向键 | reference |
